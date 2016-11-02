@@ -1,0 +1,133 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flights140</title>
+    <link rel="icon" href="{% static "Flights140base/image/plane_favicon.png" %}" />
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abel" />
+
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/semantic/dist/semantic.min.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/alertify.core.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/alertify.bootstrap.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/alertify.default.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/animate.min.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/elementTransitions.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/bootstrap/dist/css/bootstrap.min.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/avgrund.css" %}"/>
+
+    <link rel="stylesheet" text="text/css" href="{% static "Flights140base/css/main.css" %}"/>
+</head>
+<body>
+<div class="wrapper">
+<div class="top">
+    <div class="ui five item menu">
+      <a class="item individual contact">Contact</a>
+      <a class="item individual donate">Donate</a>
+      <a class="item individual how_it_works">How it works</a>
+      <a class="item individual edit_account">Edit Account</a>
+      <a href="{% url 'auth:logout' %}?next=/" class="item individual">Logout</a>
+    </div>
+
+<div class="tlt top_header" style="visibility:hidden;" data-in-effect="rollIn">Welcome to Flights140, {{name}}</div>
+<div class="top_content">
+<form action="/create_alert/" method="post" id="post_alert">
+    {% for direction in directions %}
+    {% if direction == "to" %}
+        <div class="header_divider"></div>
+        <!-- TO -->
+    {% endif %}
+    <div class="{{ direction }} left_to_right">
+        <div class="direction">
+        {% if direction == "from" %}
+            ORIGIN
+        {% else %}
+            DESTINATION
+        {% endif %}
+        </div>
+    <div class="ui fluid search selection dropdown {{ direction }}">
+        <input type="hidden" name="{{ direction }}">
+        <i class="dropdown icon"></i>
+        <div class="default text">Select
+            {% if direction == "from" %}
+                Origin
+            {% else %}
+                Destination
+            {% endif %}
+        </div>
+        <div class="menu" id="{{ direction }}">
+        </div>
+    </div>
+    </div>
+    {% endfor %}
+</form>
+<div class="buttons_top">
+<input class="ui clear button button_margin" type="submit" value="Add Alert" onclick="$('#post_alert').submit();"/>
+<div class="ui clear button button_margin" id="restore">Restore selections</div>
+</div>
+</div>
+</div>
+<div class="cards_background">
+<div class="ui horizontal divider">Alerts</div>
+<div class="ui cards">
+    {% for alert in alerts %}
+    <div class="card">
+        <div class="content">
+            <div class="header">
+                <div class="container">
+                <div class="from_place place" data-placeid="{{ alert.from_place_id }}"></div>
+                <div class="flicker">{{ alert.from_name }}</div></div>
+                <div class="ui horizontal divider">
+                    to
+                </div>
+                <div class="container">
+                <div class="to_place place" data-placeid="{{ alert.to_place_id }}" data-useplaceid="{{ alert.use_place_id }}"></div>
+                <div class="flicker">{{ alert.to_name }}</div></div>
+            </div>
+            <div class="description" align="right">
+            added <i>{{ alert.time }}</i>
+            </div>
+        </div>
+        <div class="ui bottom attached button" id={{alert.id}}>
+        <input type="hidden">
+        <i class="remove icon"></i>Remove Alert
+        </div>
+    </div>
+    {% endfor %}
+</div>
+</div>
+<div id="map" style="display:none"></div>
+<div class="forms" style="display:none;">
+<div class="contact_form_base" style="display:none;">{{ contact_form }}</div>
+<div class="how_it_works_base" style="display:none;">{{ how_it_works }}</div>
+<div class="twitter_accounts_base" style="display:none;"> {{ twitter_accounts }}</div>
+<div class="edit_account_base" style="display:none;">{{ edit_account }}</div>
+<div class="delete_account_base" style="display:none">{{ delete_account }}</div>
+<div class="donate_base" style="display:none">{{ donate }} </div>
+</div>
+<div class="push"></div>
+</div>
+
+<div class="ui inverted vertical footer segment">
+    <div class="ui container">
+        <span class="signature">Created by Zach Attas</span>
+        <img class="logo bird logos" src="/static/Flights140base/image/twitter_logo.png"/>
+        <img class="logo logos"  src="/static/Flights140base/image/google_logo.png"/>
+    </div>
+</div>
+
+<script src="{% static "Flights140base/js/jquery.min.js" %}"></script>
+<script src="{% static "Flights140base/js/semantic.min.js" %}"></script>
+<script src="{% static "Flights140base/js/underscore-min.js" %}"></script>
+<script src="{% static "Flights140base/js/alertify.min.js" %}"></script>
+<script src="{% static "Flights140base/js/jquery.lettering.js" %}"></script>
+<script src="{% static "Flights140base/js/jquery.textillate.js" %}"></script>
+<script src="{% static "Flights140base/js/jquery.avgrund.min.js" %}"></script>
+<script  src="{% static "Flights140base/js/jquery.airport.min.js" %}"></script>
+<script  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9TeoGo7bDg55LELJARNoLXCj_CJsLA4E&libraries=places"></script>
+<script src="{% static "Flights140base/js/dist/main.js" %}"></script>
+</body>
+</html>

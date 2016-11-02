@@ -1,0 +1,357 @@
+*{
+    margin: 0;
+}
+
+html, body {
+    height: 100%;
+}
+/*HEADER AND FOOTER ELEMENTS*/
+.wrapper {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    overflow-x: hidden;
+    margin: 0 auto -50px;
+    background-color: #fff5ee;
+}
+.ui.inverted.vertical.footer.segment, .push {
+    padding: 0 !important;
+    height: 50px !important;
+    background-color: rgba(145, 145, 145, .8) !important;
+    text-align: right;
+    width: 100%;
+}
+.push {
+    background-color: #fff5ee !important;
+}
+.logos {
+    text-align: right;
+}
+img.logo.bird {
+    height: 50px;
+    padding-right: 20px;
+}
+img.logo {
+    height: 25px;
+}
+.signature {
+    float: left;
+    font-size: 25px;
+    margin-top: 10px;
+    margin-left: 10px;
+    font-family: 'Abel', sans-serif !important;
+}
+/*MENU AND MODAL POPUP DESIGN*/
+.ui.five.item.menu {
+    opacity: .6 !important;
+}
+.item {
+    color: rgba(0,0,0,1) !important;
+}
+.item.individual:hover {
+    background-color: rgba(153, 153, 153, .9) !important;
+}
+.header_divider {
+     margin-top: 25px;
+     margin-left: 15px;
+     margin-right: 15px;
+     border-right: 3px solid #16222c;
+     height:75px;
+     width: 0px;
+}
+/*CONTACT MODAL*/
+.contact_form {
+    font-size: 10px !important;
+    font-family: 'Abel', sans-serif;
+}
+.contact_header {
+    font-weight: 700px;
+    font-size: 18px;
+    text-align: center;
+}
+.contact_form_box {
+    text-align: center;
+}
+textarea {
+    height: 100px;
+    width: 330px;
+    margin: 0 20px;
+    text-align: left;
+}
+ul {
+    margin-bottom: 5px !important;
+}
+li {
+    display: block;
+    padding: 1px 0;
+}
+li:before {
+    content: "\e080";
+    font-family: 'Glyphicons Halflings';
+    font-size: 6px;
+    float: left;
+    margin-top: 2px;
+    margin-left: -10px;
+    color: rgba(0,0,0,.73);
+}
+/*DONATE*/
+.donate_text {
+    font-family: 'Abel', sans-serif !important;
+    font-size: 13px;
+    text-align: justify;
+}
+
+/*EDIT ACCOUNT*/
+.edit_user_buttons {
+    margin-top: 30px;
+}
+.error_msg {
+    font-family: 'Abel', sans-serif;
+    margin-top: -20px;
+    height: 40px;
+    width: 400px;
+    color: red;
+    text-align: left;
+    vertical-align: text-top;
+}
+
+/*TWITTER ACCOUNTS MODAL*/
+.accounts {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    margin: 8px auto;
+    text-align: center;
+}
+.ui.five.column.grid {
+    text-align: center !important;
+    padding-top: 10px;
+    margin: 0 auto;
+}
+.twitter_account {
+    width: 20%;
+    text-decoration: none;
+}
+.twitter_accounts {
+    height: 40px !important;
+    width: 40px !important;
+    border-radius: 2px;
+    padding: .5 rem !important;
+}
+.twitter_label {
+    font-size: 8.5px;
+}
+.twitter_accounts_description {
+    font-family: 'Abel', sans-serif;
+    font-size: 12px;
+}
+a.twitter_accounts_description {
+    cursor: pointer;
+}
+a.twitter_link, a.twitter_link:hover, a.twitter_link:visited {
+    text-decoration: none;
+    color: black;
+    font-family: 'Abel', sans-serif;
+}
+
+/*POPIN STUFF*/
+.avgrund-overlay {
+    width:      100% !important;
+    height:     100% !important;
+    top:        0 !important;
+    left:       0 !important;
+    position:   fixed !important;
+}
+body.avgrund-active {
+    overflow: hidden;
+    transform: scale(2) !important;
+}
+.avgrund-popin {
+    background-color: rgba(181, 189, 195, .95) !important;
+    border-radius: 25px;
+    color: black;
+}
+/*SEARCH AREA*/
+.top_header {
+    width: 100%;
+    font-family: 'Abel', sans-serif;
+    text-align: left;
+    margin-left: 7%;
+    font-size: 50px;
+}
+.top_content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: .8;
+}
+.left_to_right {
+    display: inline-block;
+    text-align: left;
+    font-size: 1.1em !important;
+    width: 300px !important;
+    padding: 0 15px;
+}
+form {
+    display: inherit;
+}
+.direction {
+    font-family: 'Abel', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 26px !important;
+    color: #151515;
+}
+
+.ui.selection.dropdown .menu {
+    max-height: 25rem;
+}
+
+.ui.fluid.search.selection.dropdown {
+    margin-bottom: 7px;
+}
+
+/*CARDS*/
+.card {
+    width: 400px !important;
+    height: 316px !important;
+}
+
+.field {
+    width: 50%;
+    font-family: 'Abel', sans-serif !important;
+}
+
+.content {
+    padding: 1em 1em 0em 1em !important;
+}
+.place {
+    height: 100px;
+    width: 150px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 0 10px 0 0;
+    display: inline-block;
+    color: white;
+    z-index: 1;
+}
+.flicker {
+    width: 170px;
+    height: 50px;
+    justify-content: center;
+    color: white;
+    z-index: 3;
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    width: auto !important;
+    padding-left:0 !important;
+}
+.ui.horizontal.divider {
+    font-family: 'Abel', sans-serif !important;
+    font-size: 22px !important;
+    z-index: 2;
+}
+.card, .header {
+    font-family: 'Abel', sans-serif !important;
+    font-weight: 400 !important;
+    font-size: 22px !important;
+}
+.description {
+    font-size: 16px !important;
+}
+
+.top {
+    margin: 0 auto;
+    text-align: center;
+    height: 480px;
+    background-image: url(/static/Flights140base/image/airport.jpg);
+    width: 100%;
+    top:0;
+    left: 0;
+    background-size: cover;
+    padding-bottom: 20px;
+}
+.ui.bottom.attached.button {
+    margin: 0 !important;
+    width: 100%;
+    padding: 3px 0 0 0 !important;
+    height: 30px;
+    font-size: 16px;
+}
+
+.text{
+    color: black;
+    font-size: 1.1em;
+}
+.default.text {
+    color: rgba(96, 95, 95, 0.9) !important;
+    font-size: 1.1em !important;
+}
+
+/*ADD AND RESTORE BUTTONS*/
+.buttons_top {
+    display: inline-flex;
+    flex-direction: column;
+    margin: 0;
+}
+.button_margin {
+    margin-top: 5px !important;
+    margin-bottom: 5px !important;
+    font-size: 1.5rem !important;
+}
+.buttons_margin {
+    margin-top: 5px;
+}
+.submit_buttons_margin {
+    margin-top: 5px;
+}
+
+.cards_background {
+    background-color: #fff5ee;
+    padding-top: 10px;
+}
+.cards {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+.card {
+    border: 1px solid black !important;
+}
+.item {
+    font-size: 1.1em !important;
+}
+
+/*RESPONSIVE*/
+@media (max-width: 1000px) {
+    .from, .to {
+        width: 200px;
+    }
+    .default.text {
+        color: rgba(96, 95, 95, 0.9) !important;
+        font-size: .8em !important;
+    }
+    .item {
+        font-size: .7em !important;
+    }
+    .ui.five.item.menu {
+        font-size: 1.4em !important;
+    }
+    .direction {
+        font-size: 26px !important;
+    }
+    body.avgrund-active {
+        transform: scale(1.4) !important;
+    }
+    .top_header {
+        font-size: 30px;
+    }
+}
+@media (max-width: 700px) {
+    body.avgrund-active {
+        transform: scale(1.1) !important;
+    }
+}

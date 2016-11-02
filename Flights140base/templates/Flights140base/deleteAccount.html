@@ -1,0 +1,12 @@
+{% load static %}
+
+<form class="description" action="{% url 'flights140base:delete_user' %}" id="delete_user" method="post">
+    {% csrf_token %}
+Are you sure you want to delete your account, {{ name }}?
+<div class="text-center buttons_margin">
+<input type="submit" value="Delete Account" class="ui clear button"/>
+</div>
+</form>
+<div class="text-center buttons_margin">
+<button class="ui clear button text-center" onclick="removeAvgrund();">Cancel</button>
+</div>

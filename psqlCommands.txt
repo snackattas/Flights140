@@ -1,0 +1,33 @@
+create database flights140;
+create user flights140user with password 'password';
+ALTER ROLE flights140user SET client_encoding TO 'utf8';
+ALTER ROLE flights140user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE flights140user SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE flights140 TO flights140user;
+
+CREATE PROCEDURAL LANGUAGE 'plpython' HANDLER plpython_call_handler;
+sudo -u postgres createlang plpythonu flights140
+CREATE PROCEDURAL LANGUAGE 'plpythonu' HANDLER plpython_call_handler;
+
+CREATE FUNCTION create_user_profile ()
+    RETURNS trigger
+    LANGUAGE plpythonu
+AS $$
+    email = TD["new"]["email"]
+    auth_user_id = TD["new"]["id"]
+    if email:
+        insert_user_profile = plpy.prepare('INSERT INTO "Flights140base_userprofile" (user_id, email) VALUES ($1, $2)', ['int', 'text'])
+        rv = plpy.execute(insert_user_profile, [auth_user_id, email])
+    else:
+        insert_user_profile = plpy.prepare('INSERT INTO "Flights140base_userprofile" (user_id) VALUES ($1)', ['int'])
+        rv = plpy.execute(insert_user_profile, [auth_user_id])
+$$;
+
+CREATE TRIGGER create_user_profile_trigger
+AFTER INSERT ON "auth_user"
+FOR EACH ROW
+EXECUTE PROCEDURE create_user_profile();
+
+
+drop trigger create_user_profile_trigger on auth_user;
+drop function create_user_profile();

@@ -1,0 +1,36 @@
+<div class="how_it_works_description">
+Enter and email and/or phone number.  Whatever you fill in, a message will reach you there if a tweet matches your criteria!
+</div>
+</br>
+
+
+<form class="ui form" id="edit_user_submit" method="post">
+    <div class="two fields">
+    <div class="field">
+        <label>email</label>
+        <input name="email"
+        {% if email %}
+        value="{{email}}"
+        {% else %}
+        value=""
+        {% endif %}
+         type="text">
+    </div>
+    <div class="field">
+        <label>phone number</label>
+        <input name="phone_number"
+        {% if phone_number %}
+        value="{{phone_number}}"
+        {% else %}
+        value=""
+        {% endif %}
+         type="text">
+    </div>
+</div>
+</form>
+<div class='error_msg'></div>
+<div class="text-center edit_user_buttons">
+<input type="submit" value="Submit" class="ui clear button text-center" onclick="$('#edit_user_submit').submit();" />
+<button class="ui clear button" onclick="cancelEditUser();">Cancel</button>
+<button class="ui clear button" onclick="removeAvgrund();$('.delete_account_base').click();">Delete Account</button>
+</div>

@@ -1,0 +1,19 @@
+<div class="twitter_accounts_description">
+These are the twitter accounts that Flights140 checks to look for its deals.  Is there an account missing? <a class="twitter_accounts_description" onclick="removeAvgrund();$('.contact').click();">Write in and let me know!</a>
+</div>
+
+<div class="accounts">
+{% for twitter_accounts in twitter_account_chunks %}
+<div class="ui five column grid">
+{% for twitter_account in twitter_accounts %}
+<div class="twitter_account">
+    <a class="twitter_link" href="https://www.twitter.com/{{ twitter_account.screen_name }}">
+    <img class="twitter_accounts" src="/static/Flights140base/image/TwitterAccounts/{{twitter_account.screen_name}}.png"/>
+    <div class="twitter_label">{{ twitter_account.screen_name }}</div>
+    </a>
+</div>
+{% endfor %%}
+</div>
+{% endfor %}
+<button class="ui clear button" onclick="removeAvgrund();">Back</button>
+</div>

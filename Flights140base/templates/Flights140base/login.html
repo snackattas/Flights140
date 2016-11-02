@@ -1,0 +1,53 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Flights140</title>
+    <link rel="icon" href="{% static "Flights140base/image/plane_favicon.png" %}" />
+
+    <link href="https://fonts.googleapis.com/css?family=Abel" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/semantic/dist/semantic.min.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/bootstrap/dist/css/bootstrap.min.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/font-awesome/css/font-awesome.min.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/bootstrap-social.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/animate.min.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/avgrund.css" %}"/>
+
+    <link rel="stylesheet" type="text/css" href="{% static "Flights140base/css/login.css" %}"/>
+</head>
+<body>
+<div class="content animated bounceInDown">
+<h1 class="tlt content__heading" data-in-effect="rollIn">Flights140</h1>
+<button class="my_button button"><span class="button_text">LEARN ABOUT FLIGHTS140</span>
+</button>
+<div class="content__teaser">Sign up or Login:</div>
+<div class="content__cta">
+
+   <a href="{% url 'social:begin' 'facebook' %}?next={% url  'flights140base:main' %}" class="btn btn-block btn-social btn-facebook"> <span class="fa fa-facebook"></span>Facebook</a>
+
+   <a href="{% url 'social:begin' 'google-oauth2' %}?next={% url  'flights140base:main' %}" class="btn btn-block btn-social btn-google"> <span class="fa fa-google"></span>Google</a>
+
+   <a href="{% url 'social:begin' 'twitter' %}?next={% url  'flights140base:main' %}" class="btn btn-block btn-social btn-twitter"> <span class="fa fa-twitter"></span>Twitter</a>
+
+</div>
+</div>
+
+
+<div class="video">
+<video id="video" autoplay muted loop>
+    <source src='/static/Flights140base/video/{{ "1234567" | random }}.mp4' type='video/mp4'/>
+</video>
+</div>
+
+<script src="{% static "Flights140base/js/jquery.min.js" %}"></script>
+<script src="{% static "Flights140base/js/underscore-min.js" %}"></script>
+<script src="{% static "Flights140base/js/jquery.lettering.js" %}"></script>
+<script src="{% static "Flights140base/js/jquery.textillate.js" %}"></script>
+<script src="{% static "Flights140base/js/jquery.avgrund.min.js" %}"></script>
+<script src="{% static "Flights140base/js/dist/login.js" %}"></script>
+
+</body>
+</html>
