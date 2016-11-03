@@ -165,7 +165,7 @@ a.twitter_link, a.twitter_link:hover, a.twitter_link:visited {
 }
 body.avgrund-active {
     overflow: hidden;
-    transform: scale(2) !important;
+    transform: scale(1.7) !important;
 }
 .avgrund-popin {
     background-color: rgba(181, 189, 195, .95) !important;
