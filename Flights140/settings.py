@@ -66,7 +66,10 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
 
-BROKER_URL = "amqp://guest:guest@localhost:5672//"
+# BROKER_URL = "amqp://guest:guest@localhost:5672//"
+# CELERY_RESULT_BACKEND = "amqp"
+BROKER_URL = os.environ['RABBITMQ_BIGWIG_TX_URL']
+CELERY_RESULT_BACKEND = os.environ['RABBITMQ_BIGWIG_RX_URL']
 
 CELERY_ROUTES = {
     'Flights140base.tasks.match_tweet_to_alerts':
@@ -81,7 +84,6 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
-CELERY_RESULT_BACKEND = "amqp"
 
 from celery.task.schedules import crontab
 CELERYBEAT_SCHEDULE = {
@@ -151,17 +153,18 @@ AUTH_PROFILE_MODULE = 'Flights140base.UserProfile'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 # keep in mind user/password MUST BE lowercase cause that's how postgres rolsl
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'flights140',
-        'USER': 'flights140user',
-        'PASSWORD': os.environ['POSTGRES_FLIGHTS140USER_PASSWORD'],
-        'HOST': 'localhost',
-        'PORT': '',
-    },
-}
-
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'flights140',
+#         'USER': 'flights140user',
+#         'PASSWORD': os.environ['POSTGRES_FLIGHTS140USER_PASSWORD'],
+#         'HOST': 'localhost',
+#         'PORT': '',
+#     },
+# }
+import dj_database_url
+DATABASES['default'] =  dj_database_url.config()
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
