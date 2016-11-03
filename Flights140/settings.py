@@ -153,16 +153,17 @@ AUTH_PROFILE_MODULE = 'Flights140base.UserProfile'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 # keep in mind user/password MUST BE lowercase cause that's how postgres rolsl
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'flights140',
-#         'USER': 'flights140user',
-#         'PASSWORD': os.environ['POSTGRES_FLIGHTS140USER_PASSWORD'],
-#         'HOST': 'localhost',
-#         'PORT': '',
-#     },
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'flights140',
+        'USER': 'flights140user',
+        'PASSWORD': os.environ['POSTGRES_FLIGHTS140USER_PASSWORD'],
+        'HOST': 'localhost',
+        'PORT': '',
+    },
+}
+# for prod keep this here
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()
 
