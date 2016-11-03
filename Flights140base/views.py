@@ -73,7 +73,19 @@ def get_name(user_profile):
 @requires_login
 def main(request):
     directions = ["from", "to"]
-    user_profile = UserProfile.objects.get(user=request.user)
+    user_profile = UserProfile.objects.filter(user=request.user)
+    if not user_profile:
+        if request.user.email:
+            user_profile = UserProfile(
+                user=request.user,
+                email=request.user.email)
+            user_profile.save()
+        else:
+            user_profile = UserProfile(user=request.user)
+            user_profile.save()
+    else:
+        user_profile = user_profile[0]
+
     alert_objects = Alert.objects.filter(user=user_profile).\
         extra(order_by=['-timestamp'])
     name = get_name(user_profile)
