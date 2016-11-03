@@ -21,6 +21,9 @@ import arrow
 import datetime
 from collections import namedtuple
 from celery import shared_task
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 def chunks(array, size):
 	"""Yield successive n-sized chunks from l."""
@@ -66,6 +69,9 @@ def get_tweets():
                 "tweet":               encoded_tweet,
                 "tweet_from_keywords": from_keywords,
                 "tweet_to_keywords":   to_keywords})
+            logging.info("PARSED")
+            logging.info(encoded_tweet)
+            logging.info("FROM: "+str(from_keywords)+"   TO: "+str(to_keywords))
         else:
             new_tweet = Tweet(
                 account=twitter_account,
@@ -76,6 +82,8 @@ def get_tweets():
                 timestamp=timestamp,
                 parsed=False)
             new_tweet.save()
+            logging.info("NOT PARSED")
+            logging.info(encoded_tweet)
     tweets_to_alerts_breakup(successfully_parsed_tweets)
     return
 

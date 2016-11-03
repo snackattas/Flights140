@@ -46,6 +46,21 @@ INSTALLED_APPS = [
     'djcelery_email'
 ]
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.10/howto/static-files/
+# STATIC_URL = '/static/'
+# STATIC_ROOT = '/static/'
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static/')
+STATIC_URL = '/static/'
+
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'Flights140base/static/'),
+)
+
+
+
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = os.environ['SENDGRID_USERNAME']
 EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
@@ -182,40 +197,35 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.10/howto/static-files/
-
-STATIC_URL = '/static/'
-STATIC_ROOT = '/static/'
-CELERYD_HIJACK_ROOT_LOGGER = False
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'formatters': {
-        'simple': {
-            'format': '%(levelname)s %(message)s',
-             'datefmt': '%y %b %d, %H:%M:%S',
-            },
-        },
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-        'celery': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'Flights140/logs/celery.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
-        },
-    },
-    'loggers': {
-        'celery': {
-            'handlers': ['celery', 'console'],
-            'level': 'DEBUG',
-        }
-    }
-}
+# Using Heroku papertrail logger, so commenting out this logging config
+# CELERYD_HIJACK_ROOT_LOGGER = False
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': True,
+#     'formatters': {
+#         'simple': {
+#             'format': '%(levelname)s %(message)s',
+#              'datefmt': '%y %b %d, %H:%M:%S',
+#             },
+#         },
+#     'handlers': {
+#         'console': {
+#             'level': 'INFO',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'simple'
+#         },
+#         'celery': {
+#             'level': 'INFO',
+#             'class': 'logging.handlers.RotatingFileHandler',
+#             'filename': 'Flights140/logs/celery.log',
+#             'formatter': 'simple',
+#             'maxBytes': 1024 * 1024 * 100,  # 100 mb
+#         },
+#     },
+#     'loggers': {
+#         'celery': {
+#             'handlers': ['celery', 'console'],
+#             'level': 'DEBUG',
+#         }
+#     }
+# }
