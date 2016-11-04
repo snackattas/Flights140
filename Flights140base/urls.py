@@ -14,6 +14,5 @@ urlpatterns = [
     url(r'^member/create_alert/$', views.create_alert, name='create_alert'),
     url(r'^member/delete_alert/$', views.delete_alert, name='delete_alert'),
     url(r'^member/contact_form/$', views.contact_form, name='contact_form'),
-    url(r'^member/.*$', views.redirect_to_main, name='redirect_to_main'),
-    url(r'^.*$', views.redirect_to_main, name='redirect_to_main')
+    url(r'^member/.*$', views.redirect_to_main, name='redirect_to_main')
 ]
