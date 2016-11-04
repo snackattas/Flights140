@@ -101,6 +101,8 @@ def tweets_to_alerts_breakup(parsed_tweets_list):
 
 @shared_task
 def match_tweet_to_alerts(tweet_dict, from_alert, to_alert):
+    logging.info(tweet_dict)
+    logging.info("from_alert: "+str(from_alert)+" to_alert: "+str(to_alert))
     tweet_from_keywords = tweet_dict["tweet_from_keywords"]
     tweet_to_keywords = tweet_dict["tweet_to_keywords"]
     tweet = tweet_dict["tweet"]
