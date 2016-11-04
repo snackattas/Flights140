@@ -69,7 +69,7 @@ EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
 # BROKER_URL = "amqp://guest:guest@localhost:5672//"
 # CELERY_RESULT_BACKEND = "amqp"
 BROKER_URL = os.environ['RABBITMQ_BIGWIG_TX_URL']
-CELERY_RESULT_BACKEND = os.environ['RABBITMQ_BIGWIG_RX_URL']
+CELERY_RESULT_BACKEND = os.environ['RABBITMQ_BIGWIG_TX_URL']
 
 CELERY_ROUTES = {
     'Flights140base.tasks.match_tweet_to_alerts':
