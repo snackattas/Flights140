@@ -64,7 +64,7 @@ def tweet_parser(tweet):
         user_id=tweet.get("account_id"))
     timestamp = twitter_created_at_to_python(tweet.get("created_at"))
 
-    tweet_parsed_results = parse_tweet(tweet.text)
+    tweet_parsed_results = parse_tweet(tweet_text)
     encoded_tweet = unidecode(smart_unicode(tweet_text))
     if tweet_parsed_results:
         from_keywords = tweet_parsed_results.get('from')
