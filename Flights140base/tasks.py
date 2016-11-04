@@ -38,53 +38,65 @@ def get_tweets():
         consumer_secret=os.environ['TWITTER_CONSUMER_SECRET'],
         access_token_key=os.environ['TWITTER_ACCESS_TOKEN_KEY'],
         access_token_secret=os.environ['TWITTER_ACCESS_TOKEN_SECRET'])
-    tweet = api.GetListTimeline(
+    tweets = api.GetListTimeline(
         list_id=os.environ['TWITTER_LIST_ID'],
         since_id=last_tweet_id,
-        count=1,
+        count=10,
         include_rts=False)
 
-    if tweet:
-        tweet = tweet[0]
-        tweet_text = tweet.text
-        tweet_id = tweet.id
+    if tweets:
+        for tweet in tweets:
+            tweet_dict = {
+                "account_id":         tweet.user.id,
+                "tweet_text":         tweet.text,
+                "tweet_id":           tweet.id,
+                "created_at":         tweet.created_at}
+            stump = tweet_parser.apply_async(
+                args=[tweet_dict],
+                queue='tweetparser')
 
-        twitter_account = TwitterAccount.objects.get(user_id=tweet.user.id)
-        timestamp = twitter_created_at_to_python(tweet.created_at)
+@shared_task
+def tweet_parser(tweet):
+    tweet_text = tweet.get("tweet_text")
+    tweet_id = tweet.get("tweet_id")
 
-        tweet_parsed_results = parse_tweet(tweet.text)
-        encoded_tweet = unidecode(smart_unicode(tweet_text))
-        if tweet_parsed_results:
-            from_keywords = tweet_parsed_results.get('from')
-            to_keywords = tweet_parsed_results.get('to')
-            new_tweet = Tweet(
-                account=twitter_account,
-                tweet_id=tweet_id,
-                tweet=tweet_text,
-                from_keywords=from_keywords,
-                to_keywords=to_keywords,
-                timestamp=timestamp)
-            new_tweet.save()
-            tweet_array = {
-                "tweet":               encoded_tweet,
-                "tweet_from_keywords": from_keywords,
-                "tweet_to_keywords":   to_keywords}
-            logging.warning("PARSED")
-            logging.warning(encoded_tweet)
-            logging.warning("FROM: "+str(from_keywords)+"   TO: "+str(to_keywords))
-            tweet_to_alerts_breakup(tweet_array)
-        else:
-            new_tweet = Tweet(
-                account=twitter_account,
-                tweet_id=tweet_id,
-                tweet=tweet_text,
-                from_keywords=[],
-                to_keywords=[],
-                timestamp=timestamp,
-                parsed=False)
-            new_tweet.save()
-            logging.warning("NOT PARSED")
-            logging.warning(encoded_tweet)
+    twitter_account = TwitterAccount.objects.get(\
+        user_id=tweet.get("account_id"))
+    timestamp = twitter_created_at_to_python(tweet.get("created_at"))
+
+    tweet_parsed_results = parse_tweet(tweet.text)
+    encoded_tweet = unidecode(smart_unicode(tweet_text))
+    if tweet_parsed_results:
+        from_keywords = tweet_parsed_results.get('from')
+        to_keywords = tweet_parsed_results.get('to')
+        new_tweet = Tweet(
+            account=twitter_account,
+            tweet_id=tweet_id,
+            tweet=tweet_text,
+            from_keywords=from_keywords,
+            to_keywords=to_keywords,
+            timestamp=timestamp)
+        new_tweet.save()
+        tweet_array = {
+            "tweet":               encoded_tweet,
+            "tweet_from_keywords": from_keywords,
+            "tweet_to_keywords":   to_keywords}
+        logging.warning("PARSED")
+        logging.warning(encoded_tweet)
+        logging.warning("FROM: "+str(from_keywords)+"   TO: "+str(to_keywords))
+        tweet_to_alerts_breakup(tweet_array)
+    else:
+        new_tweet = Tweet(
+            account=twitter_account,
+            tweet_id=tweet_id,
+            tweet=tweet_text,
+            from_keywords=[],
+            to_keywords=[],
+            timestamp=timestamp,
+            parsed=False)
+        new_tweet.save()
+        logging.warning("NOT PARSED")
+        logging.warning(encoded_tweet)
     return
 
 @shared_task
