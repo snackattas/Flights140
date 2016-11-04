@@ -174,7 +174,7 @@ def load_places():
 def load_twitter_accounts():
     with open('twitterAccountMap.JSON', 'r') as f:
         twitter_accounts = json.load(f)
-    for twitter_account in twitter_acoounts:
+    for twitter_account in twitter_accounts:
         new_account = TwitterAccount(
             user_id=twitter_account.get("user_id"),
             full_name=twitter_account.get("full_name"),
