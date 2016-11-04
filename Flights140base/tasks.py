@@ -53,6 +53,7 @@ def get_tweets():
         timestamp = twitter_created_at_to_python(tweet.created_at)
 
         tweet_parsed_results = parse_tweet(tweet.text)
+        encoded_tweet = unidecode(smart_unicode(tweet_text))
         if tweet_parsed_results:
             from_keywords = tweet_parsed_results.get('from')
             to_keywords = tweet_parsed_results.get('to')
@@ -64,7 +65,6 @@ def get_tweets():
                 to_keywords=to_keywords,
                 timestamp=timestamp)
             new_tweet.save()
-            encoded_tweet = unidecode(smart_unicode(tweet_text))
             successfully_parsed_tweets.append({
                 "tweet":               encoded_tweet,
                 "tweet_from_keywords": from_keywords,
