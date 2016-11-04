@@ -38,14 +38,14 @@ def get_tweets():
         consumer_secret=os.environ['TWITTER_CONSUMER_SECRET'],
         access_token_key=os.environ['TWITTER_ACCESS_TOKEN_KEY'],
         access_token_secret=os.environ['TWITTER_ACCESS_TOKEN_SECRET'])
-    tweets = api.GetListTimeline(
+    tweet = api.GetListTimeline(
         list_id=os.environ['TWITTER_LIST_ID'],
         since_id=last_tweet_id,
-        count=10,
+        count=1,
         include_rts=False)
 
-    successfully_parsed_tweets = []
-    for (n, tweet) in enumerate(tweets):
+    if tweet:
+        tweet = tweet[0]
         tweet_text = tweet.text
         tweet_id = tweet.id
 
@@ -65,13 +65,14 @@ def get_tweets():
                 to_keywords=to_keywords,
                 timestamp=timestamp)
             new_tweet.save()
-            successfully_parsed_tweets.append({
+            tweet_array = {
                 "tweet":               encoded_tweet,
                 "tweet_from_keywords": from_keywords,
-                "tweet_to_keywords":   to_keywords})
+                "tweet_to_keywords":   to_keywords}
             logging.info("PARSED")
             logging.info(encoded_tweet)
             logging.info("FROM: "+str(from_keywords)+"   TO: "+str(to_keywords))
+            tweet_to_alerts_breakup(tweet_array)
         else:
             new_tweet = Tweet(
                 account=twitter_account,
@@ -84,20 +85,18 @@ def get_tweets():
             new_tweet.save()
             logging.info("NOT PARSED")
             logging.info(encoded_tweet)
-    tweets_to_alerts_breakup(successfully_parsed_tweets)
     return
 
 @shared_task
-def tweets_to_alerts_breakup(parsed_tweets_list):
+def tweet_to_alerts_breakup(tweet_array):
     total_alerts = Alert.objects.count()
     alert_chunk_size = 200
     chunks = range(0, total_alerts, alert_chunk_size)
-    for tweet_dict in parsed_tweets_list:
-        for from_alert in range(0, total_alerts, alert_chunk_size):
-            to_alert = from_alert + alert_chunk_size
-            tump = match_tweet_to_alerts.apply_async(
-                args=[tweet_dict, from_alert, to_alert],
-                queue='alert')
+    for from_alert in range(0, total_alerts, alert_chunk_size):
+        to_alert = from_alert + alert_chunk_size
+        tump = match_tweet_to_alerts.apply_async(
+            args=[tweet_array, from_alert, to_alert],
+            queue='alert')
 
 @shared_task
 def match_tweet_to_alerts(tweet_dict, from_alert, to_alert):
