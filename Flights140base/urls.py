@@ -16,3 +16,5 @@ urlpatterns = [
     url(r'^member/contact_form/$', views.contact_form, name='contact_form'),
     url(r'^member/.*$', views.redirect_to_main, name='redirect_to_main')
 ]
+
+handler404 = 'Flights140base.views.view404'

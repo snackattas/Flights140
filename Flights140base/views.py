@@ -395,3 +395,10 @@ def redirect_to_main(request):
         return HttpResponseRedirect(reverse('flights140base:main'))
     except:
         raise Http404("Sorry. Try reloading the page?")
+
+@requires_login
+def view404():
+    try:
+        return HttpResponseRedirect(reverse('flights140base:main'))
+    except:
+        raise Http404("Sorry. Try reloading the page?")
