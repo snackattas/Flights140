@@ -23,7 +23,7 @@ from collections import namedtuple
 from celery import shared_task
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 def chunks(array, size):
 	"""Yield successive n-sized chunks from l."""
@@ -69,9 +69,9 @@ def get_tweets():
                 "tweet":               encoded_tweet,
                 "tweet_from_keywords": from_keywords,
                 "tweet_to_keywords":   to_keywords}
-            logging.info("PARSED")
-            logging.info(encoded_tweet)
-            logging.info("FROM: "+str(from_keywords)+"   TO: "+str(to_keywords))
+            logging.warning("PARSED")
+            logging.warning(encoded_tweet)
+            logging.warning("FROM: "+str(from_keywords)+"   TO: "+str(to_keywords))
             tweet_to_alerts_breakup(tweet_array)
         else:
             new_tweet = Tweet(
@@ -83,8 +83,8 @@ def get_tweets():
                 timestamp=timestamp,
                 parsed=False)
             new_tweet.save()
-            logging.info("NOT PARSED")
-            logging.info(encoded_tweet)
+            logging.warning("NOT PARSED")
+            logging.warning(encoded_tweet)
     return
 
 @shared_task
@@ -100,8 +100,8 @@ def tweet_to_alerts_breakup(tweet_array):
 
 @shared_task
 def match_tweet_to_alerts(tweet_dict, from_alert, to_alert):
-    logging.info(tweet_dict)
-    logging.info("from_alert: "+str(from_alert)+" to_alert: "+str(to_alert))
+    logging.warning(tweet_dict)
+    logging.warning("from_alert: "+str(from_alert)+" to_alert: "+str(to_alert))
     tweet_from_keywords = tweet_dict["tweet_from_keywords"]
     tweet_to_keywords = tweet_dict["tweet_to_keywords"]
     tweet = tweet_dict["tweet"]

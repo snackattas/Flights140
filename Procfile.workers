@@ -1,2 +1,3 @@
-worker: celery worker -A Flights140 -B -n tweetworker --concurrency=1
-worker2: celery worker -A Flights140 -Q alert,email --concurrency=4
+tweet: celery worker -A Flights140 -B -n tweetworker --concurrency=1
+alert: celery worker -A Flights140 -Q alert -n alertworker --concurrency=2
+email: celery worker -A Flights140 -Q email -n emailworker --concurrency=1
