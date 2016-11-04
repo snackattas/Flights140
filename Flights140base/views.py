@@ -1,5 +1,5 @@
 from django.shortcuts import render, reverse, render_to_response
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.template.context import RequestContext
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
@@ -387,3 +387,11 @@ def delete_user(request):
         except:
             pass
     return HttpResponseRedirect(reverse('flights140base:login'))
+
+
+@requires_login
+def redirect_to_main(request):
+    try:
+        return HttpResponseRedirect(reverse('flights140base:main'))
+    except:
+        raise Http404("Sorry. Try reloading the page?")
