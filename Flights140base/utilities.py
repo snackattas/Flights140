@@ -7,7 +7,7 @@ from .parse import variables
 from unidecode import unidecode
 from collections import Counter
 from django.utils.encoding import smart_unicode
-from .models import Region, Subregion, Country, State, City
+from .models import Region, Subregion, Country, State, City, TwitterAccount
 
 def same_attributes(place):
     plural_names = place.plural_names
@@ -169,4 +169,15 @@ def load_places():
             new_city.state =\
                 State.objects.get(name=place.get("state"))
         new_city.save()
+    return
+
+def load_twitter_accounts():
+    with open('twitterAccountMap.JSON', 'r') as f:
+        twitter_accounts = json.load(f)
+    for twitter_account in twitter_acoounts:
+        new_account = TwitterAccount(
+            user_id=twitter_account.get("user_id"),
+            full_name=twitter_account.get("full_name"),
+            screen_name=twitter_account.get("screen_name"))
+        new_account.save()
     return
