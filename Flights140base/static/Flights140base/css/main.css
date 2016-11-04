@@ -165,7 +165,7 @@ a.twitter_link, a.twitter_link:hover, a.twitter_link:visited {
 }
 body.avgrund-active {
     overflow: hidden;
-    transform: scale(1.7) !important;
+    transform: scale(1.4) !important;
 }
 .avgrund-popin {
     background-color: rgba(181, 189, 195, .95) !important;
@@ -204,7 +204,7 @@ form {
 }
 
 .ui.selection.dropdown .menu {
-    max-height: 25rem;
+    max-height: 18rem;
 }
 
 .ui.fluid.search.selection.dropdown {
@@ -266,7 +266,7 @@ form {
 .top {
     margin: 0 auto;
     text-align: center;
-    height: 480px;
+    height: 400px;
     background-image: url(/static/Flights140base/image/airport.jpg);
     width: 100%;
     top:0;
@@ -344,7 +344,7 @@ form {
         font-size: 26px !important;
     }
     body.avgrund-active {
-        transform: scale(1.4) !important;
+        transform: scale(1.1) !important;
     }
     .top_header {
         font-size: 30px;
@@ -352,6 +352,6 @@ form {
 }
 @media (max-width: 700px) {
     body.avgrund-active {
-        transform: scale(1.1) !important;
+        transform: scale(1) !important;
     }
 }

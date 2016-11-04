@@ -468,6 +468,11 @@ $('.donate').avgrund({
     width: 400,
     template: $('.donate_base').css("display", "").html()
 });
+$('.privacy_policy').avgrund({
+    height: 350,
+    width: 400,
+    template: $('.privacy_policy_base').css("display", "").html()
+});
 
 // IF USER DOESN'T HAVE ACCOUNT INFOMATION IN THE SYSTEM, EDIT ACCOUNT WILL POPUP ON PAGE LOAD
 var openEditAccountOnLoad = function openEditAccountOnLoad() {

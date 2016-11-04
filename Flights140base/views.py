@@ -121,6 +121,7 @@ def main(request):
         context={'name': name})
 
     donate = render_to_string("Flights140base/donate.html")
+    privacy_policy = render_to_string("Flights140base/disclaimer.html")
     context = RequestContext(request,
                             {'request':            request,
                              'user':               request.user,
@@ -132,7 +133,8 @@ def main(request):
                              'twitter_accounts':   twitter_accounts_form,
                              'edit_account':       edit_account_form,
                              'delete_account':     delete_account_form,
-                             'donate':             donate})
+                             'donate':             donate,
+                             'privacy_policy':     privacy_policy})
     return render_to_response('Flights140base/main.html',
                               context=context)
 
