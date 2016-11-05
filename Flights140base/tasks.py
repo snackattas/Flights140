@@ -32,6 +32,7 @@ def chunks(array, size):
 
 @shared_task
 def get_tweets():
+    logging.warning("Celery beat check in")
     last_tweet_id = Tweet.objects.latest().tweet_id
     api = twitter.Api(
         consumer_key=os.environ['TWITTER_CONSUMER_KEY'],
@@ -112,11 +113,11 @@ def tweet_to_alerts_breakup(tweet_array):
 
 @shared_task
 def match_tweet_to_alerts(tweet_dict, from_alert, to_alert):
-    logging.warning(tweet_dict)
     logging.warning("from_alert: "+str(from_alert)+" to_alert: "+str(to_alert))
     tweet_from_keywords = tweet_dict["tweet_from_keywords"]
     tweet_to_keywords = tweet_dict["tweet_to_keywords"]
     tweet = tweet_dict["tweet"]
+    logging.warning(tweet)
     matched_alerts = []
     for alert in Alert.objects.order_by('-timestamp')[from_alert:to_alert]:
         alert_from_place = alert.from_where()
