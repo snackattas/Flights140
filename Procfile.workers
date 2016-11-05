@@ -1,4 +1,4 @@
 tweet: celery worker -A Flights140 -B -n tweetworker --concurrency=1
-alert: celery worker -A Flights140 -Q alert -n alertworker --concurrency=2
-email: celery worker -A Flights140 -Q email -n emailworker --concurrency=1
+alert: celery worker -A Flights140 -Q alert -n alertworker --concurrency=6
+email: celery worker -A Flights140 -Q email -n emailworker --concurrency=2
 parser: celery worker -A Flights140 -Q tweetparser -n tweetparser --concurrency=1
