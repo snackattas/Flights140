@@ -155,3 +155,11 @@ body.avgrund-active {
         font-size: 9px !important;
     }
 }
+@media (max-height: 350px) {
+    .avgrund-popin {
+        width: 400px !important;
+        margin-left: -230px !important;
+        margin-top: -380px !important;
+        font-size: 10px !important;
+    }
+}
