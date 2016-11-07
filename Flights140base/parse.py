@@ -121,15 +121,6 @@ def find_keywords(string, keywords_to_find=None):
         keywords_to_find = keywords(case_sensitive_keywords(),
                                     case_insensitive_keywords())
 
-    for keyword in keywords_to_find.case_sensitive:
-        keyword_search = search_string_capture(keyword, ignore_case=False)
-        keyword_found = keyword_search.match(string)
-        if keyword_found:
-            for string_part in keyword_found.groups():
-                if string_part:
-                    string = string.replace(string_part, "")
-            found_case_sensitive_keyword_list.append(keyword)
-
     for keyword in keywords_to_find.case_insensitive:
         keyword_search = search_string_capture(keyword)
         keyword_found = keyword_search.match(string)
@@ -138,6 +129,15 @@ def find_keywords(string, keywords_to_find=None):
                 if string_part:
                     string = string.replace(string_part, "")
             found_case_insensitive_keyword_list.append(keyword)
+
+    for keyword in keywords_to_find.case_sensitive:
+        keyword_search = search_string_capture(keyword, ignore_case=False)
+        keyword_found = keyword_search.match(string)
+        if keyword_found:
+            for string_part in keyword_found.groups():
+                if string_part:
+                    string = string.replace(string_part, "")
+            found_case_sensitive_keyword_list.append(keyword)
 
     found_keyword_list = keywords(found_case_sensitive_keyword_list,
                                 found_case_insensitive_keyword_list)

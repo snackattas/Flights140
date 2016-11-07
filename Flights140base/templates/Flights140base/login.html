@@ -21,7 +21,7 @@
 <body>
 <div class="content animated bounceInDown">
 <h1 class="tlt content__heading" data-in-effect="rollIn">Flights140</h1>
-<button class="my_button button"><span class="button_text">LEARN ABOUT FLIGHTS140</span>
+<button class="my_button button learn_about_flights140"><span class="button_text">LEARN ABOUT FLIGHTS140</span>
 </button>
 <div class="content__teaser">Sign up or Login:</div>
 <div class="content__cta">
@@ -39,11 +39,16 @@
 <div class="video">
 <video id="video" autoplay muted loop>
     <source src='/static/Flights140base/video/{{ "1234567" | random }}.mp4' type='video/mp4'/>
+    <source src='/static/Flights140base/video/{{ "1234567" | random }}.webm' type='video/webm'/>
+    Sorry, your browser doesn't support HTML5 video.
 </video>
 </div>
 
+<div style="display:none;">
+<div class="learn_base" style="display:none;">{{ learn }}</div>
+</div>
 <script src="{% static "Flights140base/js/jquery.min.js" %}"></script>
-<script src="{% static "Flights140base/js/underscore-min.js" %}"></script>
+<script src="{% static "Flights140base/js/underscore/underscore-min.js" %}"></script>
 <script src="{% static "Flights140base/js/jquery.lettering.js" %}"></script>
 <script src="{% static "Flights140base/js/jquery.textillate.js" %}"></script>
 <script src="{% static "Flights140base/js/jquery.avgrund.min.js" %}"></script>

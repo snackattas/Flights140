@@ -49,6 +49,7 @@ def requires_login(function):
 
 
 def login(request):
+    learn = render_to_string("Flights140base/learnAboutFlights140.html")
     try:
         if request.user and not request.user.is_anonymous:
             context = RequestContext(request,
@@ -57,9 +58,17 @@ def login(request):
             return HttpResponseRedirect(reverse('flights140base:main'),
                                         context)
         else:
-            return render_to_response('Flights140base/login.html')
+            learn = render_to_string("Flights140base/learnAboutFlights140.html")
+            context = RequestContext(request,
+                                    {'request': request,
+                                     'learn': learn})
+            return render_to_response('Flights140base/login.html',
+                                      context=context)
     except:
-        return render_to_response('Flights140base/login.html')
+        context = RequestContext(request,
+                                {'request': request,
+                                 'learn': learn})
+        return render_to_response('Flights140base/login.html', context=context)
 
 def get_name(user_profile):
     full_name = user_profile.user.get_full_name()

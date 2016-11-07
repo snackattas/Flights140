@@ -28,7 +28,7 @@ body {
     z-index: 1;
     position: fixed;
     top: 420px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 300;
     text-align: justify;
     color: black;
@@ -74,6 +74,9 @@ h1 {
     color: black;
     margin-bottom: 8px;
 
+}
+.avgrund-overlay {
+    z-index: -1 !important;
 }
 /* =============================================================================
   VIDEO
@@ -141,5 +144,14 @@ body.avgrund-active {
 @media (max-width: 700px) {
     body.avgrund-active {
         transform: scale(1) !important;
+    }
+}
+
+@media (max-width: 400px) {
+    .avgrund-popin {
+        width: 240px !important;
+        margin-left: -140px !important;
+        margin-top: -380px !important;
+        font-size: 9px !important;
     }
 }
