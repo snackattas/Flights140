@@ -27,7 +27,7 @@ body {
     padding: 8px 16px;
     z-index: 1;
     position: fixed;
-    top: 420px;
+    top: 360px;
     font-size: 14px;
     font-weight: 300;
     text-align: justify;
@@ -121,10 +121,10 @@ video {
 }
 
 /* Internet Explorer */
-@-ms-keyframes fadein {
+/*@-ms-keyframes fadein {
     from { opacity: 0; }
     to   { opacity: 1; }
-}
+}*/
 
 /* Opera < 12.1 */
 @-o-keyframes fadein {
@@ -149,6 +149,7 @@ body.avgrund-active {
 
 @media (max-width: 400px) {
     .avgrund-popin {
+        top: 420px !important;
         width: 240px !important;
         margin-left: -140px !important;
         margin-top: -380px !important;
@@ -157,6 +158,7 @@ body.avgrund-active {
 }
 @media (max-height: 350px) {
     .avgrund-popin {
+        top: 420px !important;
         width: 400px !important;
         margin-left: -230px !important;
         margin-top: -380px !important;

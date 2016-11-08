@@ -39,12 +39,12 @@
 
 <div class="tlt top_header" style="visibility:hidden;" data-in-effect="rollIn">Welcome to Flights140, {{name}}</div>
 <div class="top_content">
+<div class="container-fluid">
+<div class="row">
+
 <form action="/create_alert/" method="post" id="post_alert">
     {% for direction in directions %}
-    {% if direction == "to" %}
-        <div class="header_divider"></div>
-        <!-- TO -->
-    {% endif %}
+    <div class="col-sm-4">
     <div class="{{ direction }} left_to_right">
         <div class="direction">
         {% if direction == "from" %}
@@ -67,11 +67,16 @@
         </div>
     </div>
     </div>
+    </div>
     {% endfor %}
 </form>
+<div class="col-sm-4">
 <div class="buttons_top">
 <input class="ui clear button button_margin" type="submit" value="Add Alert" onclick="$('#post_alert').submit();"/>
 <div class="ui clear button button_margin" id="restore">Restore selections</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
