@@ -390,7 +390,7 @@ form {
     .ui.inverted.vertical.footer.segment {
         margin-top: 30px !important;
         height: 30px !important;
-        text-align: left;
+        /*text-align: left;*/
     }
     .signature {
         font-size: 11px;
@@ -399,9 +399,9 @@ form {
         width: 60px;
         margin-right: 20px;
     }
-    .logos {
-        text-align:left;
-    }
+    /*.logos {
+        text-align:right;
+    }*/
     .logo {
         zoom: .5;
         -moz-transform: scale(.5);
