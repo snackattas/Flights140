@@ -387,4 +387,23 @@ form {
     textarea {
         width: 220px;
     }
+    .ui.inverted.vertical.footer.segment {
+        margin-top: 30px !important;
+        height: 30px !important;
+        text-align: left;
+    }
+    .signature {
+        font-size: 11px;
+        margin-left: 0;
+        margin-top: 0;
+        width: 60px;
+        margin-right: 20px;
+    }
+    .logos {
+        text-align:left;
+    }
+    .logo {
+        zoom: .5;
+        -moz-transform: scale(.5);
+    }
 }
