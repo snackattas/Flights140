@@ -372,4 +372,18 @@ form {
         zoom: .6;
         -moz-transform: scale(.6);
     }
+    .ui.bottom.attached.button {
+        font-size: 12px;
+        padding: 0 !important;
+    }
+    .avgrund-popin {
+        left: 75%;
+        width: 260px !important;
+    }
+    .contact_form {
+        font-size: 8px !important;
+    }
+    textarea {
+        width: 220px;
+    }
 }
