@@ -1,183 +1,44 @@
-# -*- coding: utf-8 -*-
-import json
-import os
-# import urllib
+"""utilities.py - Contains general utilities for Flights140"""
 import dateutil.parser
-from .parse import variables
 from unidecode import unidecode
-from collections import Counter
 from django.utils.encoding import smart_unicode
-from .models import Region, Subregion, Country, State, City, TwitterAccount
+from twilio.rest.lookups import TwilioLookupsClient
+import requests
+import os
 
-def same_attributes(place):
-    plural_names = place.plural_names
-    if not plural_names:
-        plural_names = []
+def encode(words):
+    """This method expects raw unicode to be passed in.  Smart unicode converts accents and diacritic marks to bytestrings.  Unidecode does its best to convert bytestrings to their 26 character alphabetic equivalent.
 
-    additional_keywords = place.additional_keywords
-    if not additional_keywords:
-        additional_keywords = []
+    It is smart to handle the encoding of things from the outside world the same way every time."""
+    return unidecode(smart_unicode(words))
 
-    abbreviations = place.abbreviations
-    if not abbreviations:
-        abbreviations = []
-    return plural_names, additional_keywords, abbreviations
+def twitter_created_at_to_python(twitter_created_at):
+    """This method expects a string like 'Thu Nov 10 15:20:32 +0000 2016', which is how the dates are formatted on twitter, and converts it to a python UTC string"""
+    return dateutil.parser.parse(twitter_created_at).\
+                                     replace(tzinfo=dateutil.tz.tzutc())
 
-def copy_places():
-    cities = []
-    countries = []
-    states = []
-    subregions = []
-    regions = []
-    for place in Region.objects.all():
-        plural_names, additional_keywords, abbreviations= same_attributes(place)
-        array = {
-            "name": place.name,
-            "plural_names": plural_names,
-            "additional_keywords": additional_keywords,
-            "abbreviations": abbreviations,
-            "place_id": place.place_id
-        }
-        regions.append(array)
-    for place in Subregion.objects.all():
-        plural_names, additional_keywords, abbreviations= same_attributes(place)
-        array = {
-            "name": place.name,
-            "plural_names": plural_names,
-            "additional_keywords": additional_keywords,
-            "abbreviations": abbreviations,
-            "place_id": place.place_id,
-            "region": place.region.name
-        }
-        subregions.append(array)
-    for place in Country.objects.all():
-        plural_names, additional_keywords, abbreviations= same_attributes(place)
-        array = {
-            "name": place.name,
-            "plural_names": plural_names,
-            "additional_keywords": additional_keywords,
-            "abbreviations": abbreviations,
-            "place_id": place.place_id,
-            "region": place.region.name
-        }
-        if place.subregion:
-            array["subregion"] = place.subregion.name
-        countries.append(array)
-    for place in State.objects.all():
-        plural_names, additional_keywords, abbreviations= same_attributes(place)
-        array = {
-            "name": place.name,
-            "plural_names": plural_names,
-            "additional_keywords": additional_keywords,
-            "abbreviations": abbreviations,
-            "place_id": place.place_id,
-            "region": place.region.name,
-            "country": place.country.name
-        }
-        if place.subregion:
-            array["subregion"] = place.subregion.name
-        states.append(array)
-    for place in City.objects.all():
-        plural_names, additional_keywords, abbreviations= same_attributes(place)
-        array = {
-            "name": place.name,
-            "plural_names": plural_names,
-            "additional_keywords": additional_keywords,
-            "abbreviations": abbreviations,
-            "place_id": place.place_id,
-            "region": place.region.name,
-            "country": place.country.name
-        }
-        if place.subregion:
-            array["subregion"] = place.subregion.name
-        if place.state:
-            array["state"] = place.state.name
-        if place.iata:
-            array["iata"] = place.iata
-        else:
-            array["iata"] = []
-        cities.append(array)
-    mass_array = {
-        "regions": regions,
-        "subregions": subregions,
-        "countries": countries,
-        "states": states,
-        "cities": cities}
-    with open('places.JSON','w') as fi:
-        json.dump(mass_array, fi)
-    return mass_array
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
 
-def load_places():
-    with open('places.JSON', 'r') as f:
-        places = json.load(f)
-    for place in places.get("regions"):
-        new_region = Region(
-            name=place.get("name"),
-            plural_names=place.get("plural_names"),
-            additional_keywords=place.get("additional_keywords"),
-            abbreviations=place.get("abbreviations"),
-            place_id=place.get("place_id"))
-        new_region.save()
-    for place in places.get("subregions"):
-        new_subregion = Subregion(
-            name=place.get("name"),
-            plural_names=place.get("plural_names"),
-            additional_keywords=place.get("additional_keywords"),
-            abbreviations=place.get("abbreviations"),
-            place_id=place.get("place_id"),
-            region=Region.objects.get(name=place.get("region")))
-        new_subregion.save()
-    for place in places.get("countries"):
-        new_country = Country(
-            name=place.get("name"),
-            plural_names=place.get("plural_names"),
-            additional_keywords=place.get("additional_keywords"),
-            abbreviations=place.get("abbreviations"),
-            place_id=place.get("place_id"),
-            region=Region.objects.get(name=place.get("region")))
-        if place.get("subregion"):
-            new_country.subregion =\
-                Subregion.objects.get(name=place.get("subregion"))
-        new_country.save()
-    for place in places.get("states"):
-        new_state = State(
-            name=place.get("name"),
-            plural_names=place.get("plural_names"),
-            additional_keywords=place.get("additional_keywords"),
-            abbreviations=place.get("abbreviations"),
-            place_id=place.get("place_id"),
-            region=Region.objects.get(name=place.get("region")),
-            country=Country.objects.get(name=place.get("country")))
-        if place.get("subregion"):
-            new_state.subregion =\
-                Subregion.objects.get(name=place.get("subregion"))
-        new_state.save()
-    for place in places.get("cities"):
-        new_city = City(
-            name=place.get("name"),
-            plural_names=place.get("plural_names"),
-            additional_keywords=place.get("additional_keywords"),
-            abbreviations=place.get("abbreviations"),
-            place_id=place.get("place_id"),
-            iata=place.get("iata"),
-            region=Region.objects.get(name=place.get("region")),
-            country=Country.objects.get(name=place.get("country")))
-        if place.get("subregion"):
-            new_city.subregion =\
-                Subregion.objects.get(name=place.get("subregion"))
-        if place.get("state"):
-            new_city.state =\
-                State.objects.get(name=place.get("state"))
-        new_city.save()
-    return
+def twilio_validate(value):
+    """Uses twilio api to verify phone number is valid syntax and is a real number"""
+    ACCOUNT_SID = os.environ['TWILIO_ACCOUNT_SID']
+    AUTH_TOKEN = os.environ['TWILIO_AUTH_TOKEN']
+    client = TwilioLookupsClient(ACCOUNT_SID, AUTH_TOKEN)
+    try:
+        number = client.phone_numbers.get(value)
+    except:
+        return '{} is not a valid phone number'.format(value)
 
-def load_twitter_accounts():
-    with open('twitterAccountMap.JSON', 'r') as f:
-        twitter_accounts = json.load(f)
-    for twitter_account in twitter_accounts:
-        new_account = TwitterAccount(
-            user_id=twitter_account.get("user_id"),
-            full_name=twitter_account.get("full_name"),
-            screen_name=twitter_account.get("screen_name"))
-        new_account.save()
-    return
+
+def mailgun_validate(value):
+    """Uses mailgun api to verify if an email is valid syntax and also does some degree of validating.  It is not perfect though"""
+    MAILGUN_PUBLIC_API_KEY = os.environ['MAILGUN_PUBLIC_API_KEY']
+    request = requests.get(
+        "https://api.mailgun.net/v3/address/validate",
+        auth=("api", MAILGUN_PUBLIC_API_KEY),
+        params={"address": value})
+    if not request.json().get("is_valid"):
+        return '{} is not a valid email'.format(value)

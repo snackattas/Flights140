@@ -394,9 +394,9 @@ form {
     }
     .signature {
         font-size: 11px;
-        margin-left: 0;
+        margin-left: -10px;
         margin-top: 0;
-        width: 60px;
+        width: 100px;
         margin-right: 20px;
     }
     /*.logos {

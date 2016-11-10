@@ -1,45 +1,31 @@
-from django.shortcuts import render, reverse, render_to_response
+"""views.py - Contains the views for Flights140. The two main views are login and main.  The rest of the views are designed for ajax calls"""
+
+from django.contrib.auth.models import User
 from django.http import JsonResponse, Http404
 from django.template.context import RequestContext
 from django.template.loader import render_to_string
-from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse
-from django.core import serializers
-from django.views.decorators.csrf import csrf_protect
-from social.apps.django_app.utils import psa
+from django.shortcuts import render, reverse, render_to_response
 
-from .models import UserProfile, Alert, ContactMessage, TwitterAccount
-from .models import Region, Subregion, Country, State, City
-from .models import mailgun_validate, twilio_validate
+from .model_helpers import retrieve_random_image
+from .utilities import mailgun_validate, twilio_validate, encode, chunks
+from .view_helper import get_name, parse_ajax, does_alert_exist,\
+    create_alert_object
+from .models import UserProfile, Alert, ContactMessage, TwitterAccount,\
+    Region, Subregion, Country, State, City
 
-from functools import wraps
-from unidecode import unidecode
-import dateutil.parser
-from django.utils.encoding import smart_unicode
-import arrow
 import json
+import arrow
+import dateutil.parser
+from functools import wraps
 from random import randrange
 from collections import namedtuple
 
-
-def encode(words):
-    return unidecode(smart_unicode(words))
-
-def twitter_created_at_to_python(twitter_created_at):
-    return dateutil.parser.parse(twitter_created_at).\
-                                     replace(tzinfo=dateutil.tz.tzutc())
-
-def chunks(l, n):
-    """Yield successive n-sized chunks from l."""
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
-
-
 def requires_login(function):
-    """"""
+    """This is a decorator that checks the request.user that is passed in by python social auth processes to confirm that python social auth worked.  If python social auth processes are not cleared, the decorator redirects to the login page."""
+
     @wraps(function)
     def decorated_function(*args, **kwargs):
-        # import pdb; pdb.set_trace()
         request = args[0]
         if not request.user or request.user.is_anonymous:
             return HttpResponseRedirect(reverse('flights140base:login'))
@@ -49,7 +35,9 @@ def requires_login(function):
 
 
 def login(request):
-    learn = render_to_string("Flights140base/learnAboutFlights140.html")
+    """The view for the login page"""
+
+    # If user is already logged in by python social auth, redirect to the main view
     try:
         if request.user and not request.user.is_anonymous:
             context = RequestContext(request,
@@ -58,6 +46,7 @@ def login(request):
             return HttpResponseRedirect(reverse('flights140base:main'),
                                         context)
         else:
+            # This is the html for the learn about flights140 button
             learn = render_to_string("Flights140base/learnAboutFlights140.html")
             context = RequestContext(request,
                                     {'request': request,
@@ -65,23 +54,18 @@ def login(request):
             return render_to_response('Flights140base/login.html',
                                       context=context)
     except:
+        learn = render_to_string("Flights140base/learnAboutFlights140.html")
         context = RequestContext(request,
                                 {'request': request,
                                  'learn': learn})
         return render_to_response('Flights140base/login.html', context=context)
 
-def get_name(user_profile):
-    full_name = user_profile.user.get_full_name()
-    if full_name:
-        return full_name
-    username = user_profile.user.username
-    if username:
-        return username
-    return user_profile.email
 
 @requires_login
 def main(request):
-    directions = ["from", "to"]
+    """This is the main view of Flights140"""
+
+    # This checks if there is a user profile object already created for this user.  If there isn't, it's created here.
     user_profile = UserProfile.objects.filter(user=request.user)
     if not user_profile:
         if request.user.email:
@@ -95,42 +79,55 @@ def main(request):
     else:
         user_profile = user_profile[0]
 
-    alert_objects = Alert.objects.filter(user=user_profile).\
-        extra(order_by=['-timestamp'])
-    name = get_name(user_profile)
-    alerts = []
+    # This returns the alerts attached to this user
+    alerts = Alert.objects.filter(user=user_profile)
+    # We create an alerts_tuple to retrieve only the necessary info from the alert to pass to the template.  No need to pass the entire alert objects
     alert_tuple = namedtuple("alert_tuple", "from_name from_place_id"\
                              " to_name to_place_id use_place_id time id")
-    for alert_object in alert_objects:
-        alert_id = alert_object.id
-        from_name = alert_object.from_name()
-        from_place_id = alert_object.from_place_id()
-        to_name = alert_object.to_name()
-        to_place_id, use_place_id = alert_object.to_place_id()
-        time = arrow.get(alert_object.timestamp).humanize()
+    html_alerts = []
+    for alert in alerts:
+        alert_id = alert.id
+        from_name = alert.from_name()
+        from_place_id = alert.from_place_id()
+        to_name = alert.to_name()
+        to_place_id = alert.to_place_id()
+        use_place_id = alert.use_place_id()
+        time = arrow.get(alert.timestamp).humanize()
 
-        alert = alert_tuple(from_name=from_name, from_place_id=from_place_id,\
-            to_name=to_name, to_place_id=to_place_id,\
-            use_place_id=use_place_id, time=time, id=alert_id)
-        alerts.append(alert)
+        html_alert = alert_tuple(
+            from_name=from_name,
+            from_place_id=from_place_id,
+            to_name=to_name,
+            to_place_id=to_place_id,
+            use_place_id=use_place_id,
+            time=time,
+            id=alert_id)
+        html_alerts.append(html_alert)
+
+    # This section prepares all the html templates that are used in the modals
+    donate = render_to_string("Flights140base/donate.html")
+    privacy_policy = render_to_string("Flights140base/disclaimer.html")
     contact_form = render_to_string("Flights140base/contactForm.html")
-    twitter_accounts = TwitterAccount.objects.all().order_by("full_name")
-    twitter_account_chunks = chunks(twitter_accounts, 5)
-    twitter_accounts_form = render_to_string(\
-        "Flights140base/twitterAccounts.html",
-        {'twitter_account_chunks':twitter_account_chunks})
     how_it_works_form = render_to_string("Flights140base/howItWorks.html")
+
     email = user_profile.email
     phone_number = user_profile.phone_number
-    edit_account_form = render_to_string("Flights140base/editAccount.html",
-                                    {'email': email,
-                                    'phone_number': phone_number})
+    edit_account_form = render_to_string(
+        template_name="Flights140base/editAccount.html",
+        context={'email': email, 'phone_number': phone_number})
+
+    twitter_accounts = TwitterAccount.objects.all()
+    twitter_account_chunks = chunks(twitter_accounts, 5)
+    twitter_accounts_form = render_to_string(
+        template_name="Flights140base/twitterAccounts.html",
+        context={'twitter_account_chunks':twitter_account_chunks})
+
+    name = get_name(user_profile)
     delete_account_form = render_to_string(request=request,
         template_name="Flights140base/deleteAccount.html",
         context={'name': name})
 
-    donate = render_to_string("Flights140base/donate.html")
-    privacy_policy = render_to_string("Flights140base/disclaimer.html")
+    directions = ["from", "to"] # This is a variable for the html template
     context = RequestContext(request,
                             {'request':            request,
                              'user':               request.user,
@@ -144,181 +141,74 @@ def main(request):
                              'delete_account':     delete_account_form,
                              'donate':             donate,
                              'privacy_policy':     privacy_policy})
-    return render_to_response('Flights140base/main.html',
-                              context=context)
-
-def retrieve_place_object(data):
-    directions = ["from", "to"]
-    results = []
-    for direction in directions:
-        scope = data.get(direction+"[scope]")
-        if scope == 'CityState':
-            city_state_original = data.get(direction+"[CityState]")
-            city_state = encode(city_state_original)
-            country = encode(data.get(direction+"[Country]"))
-            country = Country.objects.get(name=country)
-            city = City.objects.filter(name=city_state, country=country)
-            if city:
-                results.append(city[0])
-                results.append("city")
-                results.append(city_state_original)
-            else:
-                state =State.objects.filter(
-                    name=city_state, country=country)[0]
-                results.append(state)
-                results.append('state')
-                results.append(city_state_original)
-        if scope == 'CountrySubregionRegion':
-            country_subregion_region_original = \
-                data.get(direction+"[CountrySubregionRegion]")
-            country_subregion_region = encode(country_subregion_region_original)
-            country = Country.objects.filter(name=country_subregion_region)
-            if country:
-                results.append(country[0])
-                results.append("country")
-                results.append(country_subregion_region_original)
-            else:
-                subregion = Subregion.objects.filter(
-                    name=country_subregion_region)
-                if subregion:
-                    results.append(subregion[0])
-                    results.append("subregion")
-                    results.append(country_subregion_region_original)
-                else:
-                    region = Region.objects.filter(
-                        name=country_subregion_region)
-                    if region:
-                        results.append(region[0])
-                        results.append("region")
-                        results.append(country_subregion_region_original)
-        if not scope:
-            results.append(None)
-            results.append(None)
-            results.append(None)
-    return results[0],results[1],results[2],results[3],results[4],results[5]
-
-
-def add_filter(alerts, from_value, from_scope, to_value, to_scope):
-    if from_scope == "region":
-        alerts = alerts.filter(from_region=from_value)
-    if from_scope == "subregion":
-        alerts = alerts.filter(from_subregion=from_value)
-    if from_scope == "country":
-        alerts = alerts.filter(from_country=from_value)
-    if from_scope == "state":
-        alerts = alerts.filter(from_state=from_value)
-    if from_scope == "city":
-        alerts = alerts.filter(from_city=from_value)
-    if to_scope:
-        if to_scope == "region":
-            alerts = alerts.filter(to_region=to_value)
-        if to_scope == "subregion":
-            alerts = alerts.filter(to_subregion=to_value)
-        if to_scope == "country":
-            alerts = alerts.filter(to_country=to_value)
-        if to_scope == "state":
-            alerts = alerts.filter(to_state=to_value)
-        if to_scope == "city":
-            alerts = alerts.filter(to_city=to_value)
-    else:
-        alerts = alerts.filter(to_region__isnull=True).\
-        filter(to_subregion__isnull=True).\
-        filter(to_country__isnull=True).\
-        filter(to_state__isnull=True).\
-        filter(to_city__isnull=True)
-    return alerts
-
-def create_alert_object(user_profile, from_value, from_scope, to_value,
-                        to_scope):
-    alert = Alert(user=user_profile)
-    if from_scope == "region":
-        alert.from_region = from_value
-    if from_scope == "subregion":
-        alert.from_subregion = from_value
-    if from_scope == "country":
-        alert.from_country = from_value
-    if from_scope == "state":
-        alert.from_state = from_value
-    if from_scope == "city":
-        alert.from_city = from_value
-    if to_scope == "region":
-        alert.to_region = to_value
-    if to_scope == "subregion":
-        alert.to_subregion = to_value
-    if to_scope == "country":
-        alert.to_country = to_value
-    if to_scope == "state":
-        alert.to_state = to_value
-    if to_scope == "city":
-        alert.to_city = to_value
-    alert.from_keywords = from_value.searchable_keywords()
-    alert.from_place_id = from_value.place_id
-    if to_value and to_scope:
-        alert.to_keywords = to_value.searchable_keywords()
-        alert.to_place_id = to_value.place_id
-    alert.save()
-    return alert
+    return render_to_response(
+        template_name='Flights140base/main.html', context=context)
 
 @requires_login
 def create_alert(request):
-    if request.method == "POST":
+    """This view is called via ajax and creates alert objects."""
+    if request.is_ajax() and request.method == "POST":
         user_profile = UserProfile.objects.get(user=request.user)
-        user_alerts = Alert.objects.filter(user=user_profile)
-        count = user_alerts.count()
+        alerts = Alert.objects.filter(user=user_profile)
+        alerts_count = alerts.count()
         max_alerts = 10
-        if count >= max_alerts:
+        if alerts_count >= max_alerts:
             error = "User has already created the maximum of {} alerts!".\
                 format(max_alerts)
             return JsonResponse({"status": 'false', "message": error},
                 status=500)
+
         data = request.POST
-        from_value, from_scope, from_original_name, \
-            to_value, to_scope, to_original_name = retrieve_place_object(data)
-        if not from_value and not from_scope:
+        from_tuple, to_tuple = parse_ajax(data)
+
+        if not from_tuple.scope:
             error = "Must enter FROM criteria"
-            if not to_value and not to_scope:
+            if not to_tuple.scope:
                 error = "Must enter criteria"
             return JsonResponse({"status": 'false', "message": error},
                 status=500)
-        if (from_scope == 'city' and to_scope == "city") or \
-            (from_scope == 'state' and to_scope == 'state'):
-            if from_value == to_value:
+
+        if (from_tuple.scope == 'city' and to_tuple.scope == "city") or \
+            (from_tuple.scope == 'state' and to_tuple.scope == 'state'):
+            if from_tuple.value == to_tuple.value:
                 error = "Cannot have matching cities"
                 return JsonResponse({"status": 'false', "message": error},
                     status=500)
-        # Lastly, check to make sure this criteria doesn't exist already
 
-        found = add_filter(user_alerts, from_value, from_scope, to_value,
-                           to_scope)
+        # Lastly, check to make sure this criteria doesn't exist already
+        found = does_alert_exist(alerts, from_tuple.value, from_tuple.scope,
+                                 to_tuple.value, to_tuple.scope)
         if found:
             error = "An alert with this criteria already exists"
             return JsonResponse({"status": 'false', "message": error},
                 status=500)
-        alert = create_alert_object(user_profile, from_value, from_scope,
-                                    to_value, to_scope)
-        new_dict = {}
 
-        new_dict["from_value"] = from_original_name
-        new_dict["id"] = alert.id
-        new_dict["from_place_id"] =  from_value.place_id
-        if not to_value and not to_scope:
-            url = "/static/Flights140base/image/randompics/{}.jpg".format(randrange(1,51))
+        alert = create_alert_object(user_profile, from_tuple.value,
+            from_tuple.scope, to_tuple.value, to_tuple.scope)
+        # Now that the alert has been created in the database, need to send back a dictionary with relevant information to the client
+        new_dict = {}
+        new_dict["from_value"] = from_tuple.original_name
+        new_dict["id"] = alert.id # Need the alert's id for easy deletion
+        new_dict["from_place_id"] =  alert.from_where().place_id
+        # If the to field doesn't exist, send a random image url and tell the client not to use the place_id to find a photo
+        if not to_tuple.scope:
             new_dict["to_value"] = "Anywhere"
-            new_dict["to_place_id"] = url
+            new_dict["to_place_id"] = retrieve_random_image()
             new_dict["use_place_id"] = False
         else:
-            new_dict["to_value"] = to_original_name
-            new_dict["to_place_id"] = to_value.place_id
+            new_dict["to_value"] = to_tuple.original_name
+            new_dict["to_place_id"] = alert.to_where().place_id
             new_dict["use_place_id"] = True
         return JsonResponse({
             'success': 'success',
             "status_code": 200,
             "data": new_dict})
-
+    return HttpResponseRedirect(reverse('flights140base:login'))
 
 @requires_login
 def delete_alert(request):
-    if request.method == "POST":
+    """This is the ajax view that deletes alerts by passing the alert id.  The action comes from clicking the 'Remove Alert' button in a card"""
+    if request.is_ajax() and request.method == "POST":
         try:
             user_profile = UserProfile.objects.get(user=request.user)
             delete_id = request.POST.get("id")
@@ -338,16 +228,18 @@ def delete_alert(request):
             error = "An error occurred.  Try again later"
             return JsonResponse({"status": 'false', "message": error},
                 status=500)
+    return HttpResponseRedirect(reverse('flights140base:login'))
 
 @requires_login
 def edit_user(request):
-    user_profile = UserProfile.objects.get(user=request.user)
+    """This is the ajax view that enables a user to edit their account by clicking submit in the 'Edit Contant' modal.  """
     if request.is_ajax() and request.method == 'POST':
+        user_profile = UserProfile.objects.get(user=request.user)
         email = request.POST.get("email")
         phone_number = request.POST.get("phone_number")
         error = ""
         if email:
-            email_error = mailgun_validate(email, initial=False)
+            email_error = mailgun_validate(email)
             if email_error:
                 error += "</br>{}".format(email_error)
             else:
@@ -355,7 +247,7 @@ def edit_user(request):
         else:
             user_profile.email = ""
         if phone_number:
-            phone_number_error = twilio_validate(phone_number, initial=False)
+            phone_number_error = twilio_validate(phone_number)
             if phone_number_error:
                 error += "</br>{}".format(phone_number_error)
             else:
@@ -367,13 +259,13 @@ def edit_user(request):
                 status=500)
         user_profile.save()
         return JsonResponse({'success': 'success', "status_code": 200})
-
-
+    return HttpResponseRedirect(reverse('flights140base:login'))
 
 @requires_login
 def contact_form(request):
-    user_profile = UserProfile.objects.get(user=request.user)
+    """This is the ajax view that stores a contact message from the contact modal"""
     if request.is_ajax() and request.method == 'POST':
+        user_profile = UserProfile.objects.get(user=request.user)
         message = request.POST.get("message")
         if message:
             new_message = ContactMessage(
@@ -381,13 +273,12 @@ def contact_form(request):
                 message=message)
             new_message.save()
             return JsonResponse({'success': 'success', "status_code": 200})
-    error = "An error occurred.  Try again later"
-    return JsonResponse({"status": 'false', "message": error},
-        status=500)
+    return HttpResponseRedirect(reverse('flights140base:login'))
 
 
 @requires_login
 def delete_user(request):
+    """This is the ajax view that deletes a user's python social auth user, userprofile, and all associated alerts"""
     if request.method == 'POST':
         try:
             user_profile = UserProfile.objects.get(user=request.user)

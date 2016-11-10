@@ -109,10 +109,16 @@ var setDeleteButtonAction = function setDeleteButtonAction(jQueryObjects) {
 };
 
 var createPost = function createPost(allJSON) {
-    var max_alerts = 10;
-    var from_place = $(".from.dropdown").dropdown("get value");
-    var to_place = $(".to.dropdown").dropdown("get value");
+    // before saving an alert, always good to check that the user account has at least an email or a phone number in it
     openEditAccountOnLoad();
+    // First check if dropdowns have values.  The actual text in the value might not be accurate though, because some of the values have the ' character in them. So values like N'djamena will be stored in the value position as N.  So use the .text class to retrieve the actual value.
+    if ($(".from.dropdown").dropdown("get value")) {
+        var from_place = $(".from").find(".text").text();
+    };
+    if ($(".to.dropdown").dropdown("get value")) {
+        var to_place = $(".to").find(".text").text();
+    };
+
     if (!from_place) {
         if (!to_place) {
             return;
@@ -120,6 +126,8 @@ var createPost = function createPost(allJSON) {
             return alertify.error("Must enter FROM criteria");
         };
     };
+
+    var max_alerts = 10;
     if ($('.card').length >= max_alerts) {
         return alertify.error('User has already created the maximum of ' + max_alerts + ' alerts!');
     };
@@ -149,6 +157,7 @@ var createPost = function createPost(allJSON) {
             };
         };
     };
+    console.log(data)
     $.ajax({
         url: "create_alert/",
         type: "POST",

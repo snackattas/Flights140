@@ -1,11 +1,13 @@
+"""prodTests.py - This is a module for unit testing the production database.  It's necesary to test with the prod database because much of the functionality of Flights140 is dependent on the data in the models that refer to places like Region,  Subregion, etc.  Simply run `python manage.py prodTests` in the root directory to run all the tests in this module"""
 # http://stackoverflow.com/questions/5360833/how-to-run-multiple-classes-in-single-test-suite-in-python-unit-testing
 # http://stackoverflow.com/questions/1646468/how-to-run-django-unit-tests-on-production-database
 
-from django.core.management.base import BaseCommand
-import unittest
-from Flights140base.parse import exclude_airline, parse_tweet
 import os
 import twitter
+import unittest
+from django.core.management.base import BaseCommand
+from Flights140base.parse import remove_airline, parse_tweet
+
 
 class Command(BaseCommand):
     help = """

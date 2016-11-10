@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from django.contrib import admin
+
 from .models import UserProfile, Alert, TwitterAccount, Tweet, ContactMessage
-# Register your models here.
 from .models import Region, Subregion, Country, State, City
 
 class UserProfileAdmin(admin.ModelAdmin):

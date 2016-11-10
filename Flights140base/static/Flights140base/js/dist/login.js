@@ -1,15 +1,12 @@
 'use strict';
 
 $(document).ready(function () {
-    $('.tlt').textillate({
-        in: {
-            delayScale: 1
-        }
-    });
+    // vid settings
     var videoPlayer = document.getElementById("video");
     videoPlayer.onpause = function (e) {
         videoPlayer.play();
     };
+    // avgrund activation
     $('button').avgrund({
         onLoad: function onLoad() {
             $(".content").css("visibility", "hidden");
@@ -23,6 +20,13 @@ $(document).ready(function () {
         width: 400,
         template: $('.learn_base').css("display", "").html()
     });
+    // Rolling in header
+    $('.tlt').textillate({
+        in: {
+            delayScale: 1
+        }
+    });
+    // this function makes the button able to be clicked only after the header animation is done
     var timeout = function timeout() {
         setTimeout(function () {
             $('body').css({ "background-image": "none" });
