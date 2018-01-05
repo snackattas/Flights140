@@ -43,7 +43,7 @@ def get_tweets():
                 "tweet_id":           tweet.id,
                 "created_at":         tweet.created_at}
             tweet_parser.apply_async(
-                args=[tweet_dict],
+                args=[raw_tweet_dict],
                 queue='tweetparser')
 
 @shared_task
